@@ -2,6 +2,8 @@ module github.com/swimlane/wal-g
 
 go 1.21
 
+replace github.com/wal-g/wal-g => ./
+
 require (
 	cloud.google.com/go/storage v1.36.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.0
@@ -27,7 +29,7 @@ require (
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pglogrepl v0.0.0-20240307033717-828fbfe908e9
 	github.com/jackc/pgproto3/v2 v2.3.3
-	github.com/jackc/pgx/v4 v4.18.3
+	github.com/jackc/pgx/v5 v5.5.5
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/minio/sio v0.2.0
@@ -63,6 +65,7 @@ require (
 	github.com/pkg/profile v1.6.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/prometheus/client_model v0.2.0
+	github.com/wal-g/wal-g v0.0.0-00010101000000-000000000000
 	golang.org/x/mod v0.16.0
 	golang.org/x/sys v0.18.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -115,10 +118,8 @@ require (
 	github.com/hashicorp/go-memdb v1.3.0 // indirect
 	github.com/hashicorp/go-multierror v1.0.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hpcloud/tail v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
@@ -133,7 +134,6 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/mschoch/smat v0.0.0-20160514031455-90eadee771ae // indirect
-	github.com/onsi/ginkgo v1.6.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
@@ -172,7 +172,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240304161311-37d4d3c04a78 // indirect
 	google.golang.org/grpc v1.62.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
-	gopkg.in/fsnotify.v1 v1.4.7 // indirect
-	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
