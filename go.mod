@@ -2,7 +2,10 @@ module github.com/swimlane/wal-g
 
 go 1.21
 
-replace github.com/wal-g/wal-g => ./
+replace (
+	github.com/jackc/pgx/pgtype => github.com/jackc/pgtype v1.14.2
+	github.com/wal-g/wal-g => ./
+)
 
 require (
 	cloud.google.com/go/storage v1.36.0
@@ -29,7 +32,7 @@ require (
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pglogrepl v0.0.0-20240307033717-828fbfe908e9
 	github.com/jackc/pgproto3/v2 v2.3.3
-	github.com/jackc/pgx/v5 v5.5.5
+	github.com/jackc/pgx/v4 v4.18.2
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/minio/sio v0.2.0
@@ -60,6 +63,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.0-alpha.2
 	github.com/cactus/go-statsd-client/v5 v5.0.0
 	github.com/google/brotli/go/cbrotli v0.0.0-20220110100810-f4153a09f87c
+	github.com/jackc/pgx/pgtype v1.14.2
 	github.com/klauspost/compress v1.15.12
 	github.com/ncw/swift/v2 v2.0.2
 	github.com/pkg/profile v1.6.0
@@ -95,7 +99,7 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/fsnotify/fsnotify v1.4.7 // indirect
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/glycerine/go-unsnap-stream v0.0.0-20190901134440-81cf024a9e0a // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
@@ -124,7 +128,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
-	github.com/jackc/pgx/v4 v4.18.2 // indirect
+	github.com/jackc/pgx/v5 v5.5.4 // indirect
 	github.com/jessevdk/go-flags v1.4.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
@@ -134,6 +138,7 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/mschoch/smat v0.0.0-20160514031455-90eadee771ae // indirect
+	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
