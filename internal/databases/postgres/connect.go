@@ -63,7 +63,7 @@ func connect(ctx context.Context, config *pgx.ConnConfig) (c *pgx.Conn, err erro
 
 // Connect establishes a connection with a PostgreSQL server with a connection string. See
 // pgconn.Connect for details.
-func Connect(ctx context.Context, pgx.connString string) (*pgx.Conn, error) {
+func Connect(ctx context.Context, connString string) (*pgx.Conn, error) {
 	connConfig, err := ParseConfig(pgx.connString)
 	if err != nil {
 		return nil, err
