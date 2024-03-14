@@ -13,7 +13,7 @@ import (
 //
 // Example: PGHOST=/var/run/postgresql or PGHOST=10.0.0.1
 func Connect(configOptions ...func(config *pgx.ConnConfig) error) (*pgx.Conn, error) {
-	config, err := pgx.ParseEnvLibpq()
+	config, err := pgx.ParseConfig()
 	if err != nil {
 		return nil, errors.Wrap(err, "Connect: unable to read environment variables")
 	}
