@@ -2,83 +2,89 @@ package postgres
 
 import (
 	"context"
-	"strings"
-
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 	"github.com/wal-g/tracelog"
 )
 
-func connect(ctx context.Context, config *pgx.ConnConfig) (c *pgx.Conn, err error) {
-	// Default values are set in ParseConfig. Enforce initial creation by ParseConfig rather than setting defaults from
-	// zero values.
-	if !config.createdByParseConfig {
-		panic("config must be created by ParseConfig")
+// Connect establishes a connection to postgres using
+// a UNIX socket. Must export PGHOST and run with `sudo -E -u postgres`.
+// If PGHOST is not set or if the connection fails, an error is returned
+// and the connection is `<nil>`.
+//
+// Example: PGHOST=/var/run/postgresql or PGHOST=10.0.0.1
+func Connect(ctx context.Context, configOptions ...func(*pgx.ConnConfig) error) (*pgx.Conn, error) {
+	config, err := pgx.ParseConfig("")
+	if err != nil {
+		return nil, errors.Wrap(err, "Connect: unable to read environment variables")
 	}
 
-	c = &Conn{
-		config:   config,
-		connInfo: pgtype.NewConnInfo(),
-		logLevel: config.LogLevel,
-		logger:   config.Logger,
+	// apply passed custom config options, if any
+	for _, option := range configOptions {
+		err := option(config)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	// Only install pgx notification system if no other callback handler is present.
-	if config.Config.OnNotification == nil {
-		config.Config.OnNotification = c.bufferNotifications
+	conn, err := pgx.ConnectConfig(ctx, config)
+	if err != nil {
+		conn, err = tryConnectToGpSegment(ctx, config)
+
+		if err != nil && config.Host != "localhost" {
+			tracelog.ErrorLogger.Println(err.Error())
+			tracelog.ErrorLogger.Println("Failed to connect using provided PGHOST and PGPORT, trying localhost:5432")
+			config.Host = "localhost"
+			config.Port = 5432
+			conn, err = pgx.ConnectConfig(ctx, config)
+		}
+
+		if err != nil {
+			return nil, errors.Wrap(err, "Connect: postgres connection failed")
+		}
+	}
+
+	var archiveMode string
+
+	// TODO: Move this logic to queryRunner
+	err = conn.QueryRow(ctx, "show archive_mode").Scan(&archiveMode)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Connect: postgres archive_mode test failed")
+	}
+
+	if archiveMode != "on" && archiveMode != "always" {
+		tracelog.WarningLogger.Println(
+			"It seems your archive_mode is not enabled. This will cause inconsistent backup. " +
+				"Please consider configuring WAL archiving.")
 	} else {
-		if c.shouldLog(LogLevelDebug) {
-			c.log(ctx, LogLevelDebug, "pgx notification handler disabled by application supplied OnNotification", map[string]interface{}{"host": config.Config.Host})
+		var archiveCommand string
+
+		err = conn.QueryRow(ctx, "show archive_command").Scan(&archiveCommand)
+
+		if err != nil {
+			return nil, errors.Wrap(err, "Connect: postgres archive_mode test failed")
+		}
+
+		if len(archiveCommand) == 0 || archiveCommand == "(disabled)" {
+			tracelog.WarningLogger.Println(
+				"It seems your archive_command is not configured. This will cause inconsistent backup." +
+					" Please consider configuring WAL archiving.")
 		}
 	}
 
-	if c.shouldLog(LogLevelInfo) {
-		c.log(ctx, LogLevelInfo, "Dialing PostgreSQL server", map[string]interface{}{"host": config.Config.Host})
-	}
-	c.pgConn, err = pgconn.ConnectConfig(ctx, &config.Config)
-	if err != nil {
-		if c.shouldLog(LogLevelError) {
-			c.log(ctx, LogLevelError, "connect failed", map[string]interface{}{"err": err})
-		}
-		return nil, err
-	}
-
-	c.preparedStatements = make(map[string]*pgconn.StatementDescription)
-	c.doneChan = make(chan struct{})
-	c.closedChan = make(chan error)
-	c.wbuf = make([]byte, 0, 1024)
-
-	if c.config.BuildStatementCache != nil {
-		c.stmtcache = c.config.BuildStatementCache(c.pgConn)
-	}
-
-	// Replication connections can't execute the queries to
-	// populate the c.PgTypes and c.pgsqlAfInet
-	if _, ok := config.Config.RuntimeParams["replication"]; ok {
-		return c, nil
-	}
-
-	return c, nil
-}
-
-// Connect establishes a connection with a PostgreSQL server with a connection string. See
-// pgconn.Connect for details.
-func Connect(ctx context.Context, connString string) (*pgx.Conn, error) {
-	connConfig, err := ParseConfig(pgx.connString)
-	if err != nil {
-		return nil, err
-	}
-	return connect(ctx, connConfig)
+	return conn, nil
 }
 
 // nolint:gocritic
-func tryConnectToGpSegment(config pgx.ConnConfig) (*pgx.Conn, error) {
-	config.RuntimeParams["gp_role"] = "utility"
-	conn, err := pgx.Connect(context.Background(), pgx.connString)
+func tryConnectToGpSegment(ctx context.Context, config *pgx.ConnConfig) (*pgx.Conn, error) {
+	config.RuntimeParams = map[string]string{"gp_role": "utility"}
+	conn, err := pgx.ConnectConfig(ctx, config)
 
 	if err != nil {
-		config.RuntimeParams["gp_session_role"] = "utility"
-		conn, err = pgx.Connect(context.Background(), pgx.connString)
+		config.RuntimeParams = map[string]string{"gp_session_role": "utility"}
+		conn, err = pgx.ConnectConfig(ctx, config)
 	}
 	return conn, err
 }
