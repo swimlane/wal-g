@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/pgtype"
 	"github.com/wal-g/tracelog"
 	"github.com/wal-g/wal-g/internal"

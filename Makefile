@@ -10,7 +10,7 @@ DOCKER_COMMON := golang ubuntu ubuntu_20_04 s3
 CMD_FILES = $(wildcard cmd/**/*.go)
 PKG_FILES = $(wildcard internal/**/*.go internal/**/**/*.go internal/*.go)
 TEST_FILES = $(wildcard test/*.go testtools/*.go)
-PKG := github.com/swimlane/wal-g
+PKG := github.com/wal-g/wal-g
 COVERAGE_FILE := coverage.out
 TEST := "pg_tests"
 MYSQL_TEST := "mysql_base_tests"
@@ -41,7 +41,7 @@ test: deps unittest pg_build mysql_build redis_build mongo_build gp_build unlink
 pg_test: deps pg_build unlink_brotli pg_integration_test
 
 pg_build: $(CMD_FILES) $(PKG_FILES)
-	(cd $(MAIN_PG_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X $(PKG)/cmd/pg.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X $(PKG)/cmd/pg.gitRevision=`git rev-parse --short HEAD` -X $(PKG)/cmd/pg.walgVersion=`git tag -l --points-at HEAD`")
+	(cd $(MAIN_PG_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X github.com/wal-g/wal-g/cmd/pg.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X github.com/wal-g/wal-g/cmd/pg.gitRevision=`git rev-parse --short HEAD` -X github.com/wal-g/wal-g/cmd/pg.walgVersion=`git tag -l --points-at HEAD`")
 
 install_and_build_pg: deps pg_build
 
@@ -114,10 +114,10 @@ mysql_base: deps mysql_build unlink_brotli
 mysql_test: deps mysql_build unlink_brotli mysql_integration_test
 
 mysql_build: $(CMD_FILES) $(PKG_FILES)
-	(cd $(MAIN_MYSQL_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X $(PKG)/cmd/mysql.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X $(PKG)/cmd/mysql.gitRevision=`git rev-parse --short HEAD` -X $(PKG)/cmd/mysql.walgVersion=`git tag -l --points-at HEAD`")
+	(cd $(MAIN_MYSQL_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X github.com/wal-g/wal-g/cmd/mysql.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X github.com/wal-g/wal-g/cmd/mysql.gitRevision=`git rev-parse --short HEAD` -X github.com/wal-g/wal-g/cmd/mysql.walgVersion=`git tag -l --points-at HEAD`")
 
 sqlserver_build: $(CMD_FILES) $(PKG_FILES)
-	(cd $(MAIN_SQLSERVER_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X $(PKG)/cmd/sqlserver.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X $(PKG)/cmd/sqlserver.gitRevision=`git rev-parse --short HEAD` -X $(PKG)/cmd/sqlserver.walgVersion=`git tag -l --points-at HEAD`")
+	(cd $(MAIN_SQLSERVER_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X github.com/wal-g/wal-g/cmd/sqlserver.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X github.com/wal-g/wal-g/cmd/sqlserver.gitRevision=`git rev-parse --short HEAD` -X github.com/wal-g/wal-g/cmd/sqlserver.walgVersion=`git tag -l --points-at HEAD`")
 
 load_docker_common:
 	@if [ "x" = "${CACHE_FOLDER}x" ]; then\
@@ -151,7 +151,7 @@ mariadb_integration_test: unlink_brotli load_docker_common
 mongo_test: deps mongo_build unlink_brotli
 
 mongo_build: $(CMD_FILES) $(PKG_FILES)
-	(cd $(MAIN_MONGO_PATH) && go build $(BUILD_ARGS) -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X $(PKG)/cmd/mongo.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X $(PKG)/cmd/mongo.gitRevision=`git rev-parse --short HEAD` -X $(PKG)/cmd/mongo.walgVersion=`git tag -l --points-at HEAD`")
+	(cd $(MAIN_MONGO_PATH) && go build $(BUILD_ARGS) -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X github.com/wal-g/wal-g/cmd/mongo.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X github.com/wal-g/wal-g/cmd/mongo.gitRevision=`git rev-parse --short HEAD` -X github.com/wal-g/wal-g/cmd/mongo.walgVersion=`git tag -l --points-at HEAD`")
 
 mongo_install: mongo_build
 	mv $(MAIN_MONGO_PATH)/wal-g $(GOBIN)/wal-g
@@ -179,7 +179,7 @@ fdb_integration_test: load_docker_common
 redis_test: deps redis_build unlink_brotli redis_integration_test
 
 redis_build: $(CMD_FILES) $(PKG_FILES)
-	(cd $(MAIN_REDIS_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X $(PKG)/cmd/redis.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X $(PKG)/cmd/redis.gitRevision=`git rev-parse --short HEAD` -X $(PKG)/cmd/redis.walgVersion=`git tag -l --points-at HEAD`")
+	(cd $(MAIN_REDIS_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X github.com/wal-g/wal-g/cmd/redis.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X github.com/wal-g/wal-g/cmd/redis.gitRevision=`git rev-parse --short HEAD` -X github.com/wal-g/wal-g/cmd/redis.walgVersion=`git tag -l --points-at HEAD`")
 
 redis_integration_test: load_docker_common
 	docker-compose build redis redis_tests
@@ -204,7 +204,7 @@ clean_redis_features:
 etcd_test: deps etcd_build unlink_brotli etcd_integration_test
 
 etcd_build: $(CMD_FILES) $(PKG_FILES)
-	(cd $(MAIN_ETCD_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X $(PKG)/cmd/etcd.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X $(PKG)/cmd/etcd.gitRevision=`git rev-parse --short HEAD` -X $(PKG)/cmd/etcd.walgVersion=`git tag -l --points-at HEAD`")
+	(cd $(MAIN_ETCD_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X github.com/wal-g/wal-g/cmd/etcd.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X github.com/wal-g/wal-g/cmd/etcd.gitRevision=`git rev-parse --short HEAD` -X github.com/wal-g/wal-g/cmd/etcd.walgVersion=`git tag -l --points-at HEAD`")
 
 etcd_install: etcd_build
 	mv $(MAIN_ETCD_PATH)/wal-g $(GOBIN)/wal-g
@@ -219,7 +219,7 @@ etcd_integration_test: load_docker_common
 	docker-compose up --exit-code-from etcd_tests etcd_tests
 
 gp_build: $(CMD_FILES) $(PKG_FILES)
-	(cd $(MAIN_GP_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X $(PKG)/cmd/gp.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X $(PKG)/cmd/gp.gitRevision=`git rev-parse --short HEAD` -X $(PKG)/cmd/gp.walgVersion=`git tag -l --points-at HEAD`")
+	(cd $(MAIN_GP_PATH) && go build -mod vendor -tags "$(BUILD_TAGS)" -o wal-g -ldflags "-s -w -X github.com/wal-g/wal-g/cmd/gp.buildDate=`date -u +%Y.%m.%d_%H:%M:%S` -X github.com/wal-g/wal-g/cmd/gp.gitRevision=`git rev-parse --short HEAD` -X github.com/wal-g/wal-g/cmd/gp.walgVersion=`git tag -l --points-at HEAD`")
 
 gp_clean:
 	(cd $(MAIN_GP_PATH) && go clean)

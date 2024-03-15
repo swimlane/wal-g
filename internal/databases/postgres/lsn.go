@@ -1,6 +1,6 @@
 package postgres
 
-import "github.com/jackc/pgx/v4"
+import "github.com/jackc/pgx"
 
 type LSN uint64
 
