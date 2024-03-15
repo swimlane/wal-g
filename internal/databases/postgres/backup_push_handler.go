@@ -157,7 +157,7 @@ func (bh *BackupHandler) createAndPushBackup(ctx context.Context) {
 		bh.prevBackupInfo.sentinelDto.BackupStartLSN, bh.prevBackupInfo.filesMetadataDto.Files, arguments.forceIncremental,
 		viper.GetInt64(conf.TarSizeThresholdSetting))
 
-	err = bh.startBackup()
+	err = bh.startBackup(context.Background())
 	tracelog.ErrorLogger.FatalOnError(err)
 	bh.handleDeltaBackup(folder)
 	tarFileSets := bh.uploadBackup()
@@ -486,7 +486,7 @@ func NewBackupHandler(arguments BackupArguments) (bh *BackupHandler, err error) 
 	// and version cannot be read easily using replication connection.
 	// Retrieve both with this helper function which uses a temp connection to postgres.
 
-	pgInfo, err := getPgServerInfo()
+	pgInfo, err := getPgServerInfo(context.Background())
 	if err != nil {
 		return nil, err
 	}
