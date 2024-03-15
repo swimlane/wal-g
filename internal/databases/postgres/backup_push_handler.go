@@ -175,10 +175,10 @@ func (bh *BackupHandler) createAndPushBackup(ctx context.Context) {
 	tracelog.InfoLogger.Printf("Wrote backup with name %s to storage %s", bh.CurBackupInfo.Name, storageNames[0])
 }
 
-func (bh *BackupHandler) startBackup() error {
+func (bh *BackupHandler) startBackup(ctx context.Context) error {
 	// Connect to postgres and start/finish a nonexclusive backup.
 	tracelog.DebugLogger.Println("Connecting to Postgres.")
-	conn, err := Connect()
+	conn, err := Connect(ctx)
 	if err != nil {
 		return err
 	}
@@ -540,10 +540,10 @@ func (bh *BackupHandler) runRemoteBackup(ctx context.Context) *StreamingBaseBack
 	return baseBackup
 }
 
-func getPgServerInfo() (pgInfo BackupPgInfo, err error) {
+func getPgServerInfo(ctx context.Context) (pgInfo BackupPgInfo, err error) {
 	// Creating a temporary connection to read slot info and wal_segment_size
 	tracelog.DebugLogger.Println("Initializing tmp connection to read Postgres info")
-	tmpConn, err := Connect()
+	tmpConn, err := Connect(ctx)
 	if err != nil {
 		return pgInfo, err
 	}
@@ -574,7 +574,7 @@ func getPgServerInfo() (pgInfo BackupPgInfo, err error) {
 	pgInfo.systemIdentifier = queryRunner.SystemIdentifier
 	tracelog.DebugLogger.Printf("Postgres SystemIdentifier: %d", queryRunner.Version)
 
-	err = tmpConn.Close()
+	err = tmpConn.Close(context.Background())
 	if err != nil {
 		return pgInfo, err
 	}

@@ -180,7 +180,7 @@ func (queryRunner *PgQueryRunner) getVersion() (err error) {
 	defer queryRunner.Mu.Unlock()
 
 	conn := queryRunner.Connection
-	err = conn.QueryRow(queryRunner.buildGetVersion()).Scan(&queryRunner.Version)
+	err = conn.QueryRow(context.Background(), queryRunner.buildGetVersion()).Scan(&queryRunner.Version)
 	return errors.Wrap(err, "GetVersion: getting Postgres version failed")
 }
 
@@ -190,7 +190,7 @@ func (queryRunner *PgQueryRunner) getCurrentLsn() (lsn string, err error) {
 	defer queryRunner.Mu.Unlock()
 
 	conn := queryRunner.Connection
-	err = conn.QueryRow(queryRunner.buildGetCurrentLsn()).Scan(&lsn)
+	err = conn.QueryRow(context.Background(), queryRunner.buildGetCurrentLsn()).Scan(&lsn)
 	if err != nil {
 		return "", errors.Wrap(err, "GetCurrentLsn: getting current LSN of the cluster failed")
 	}
@@ -206,7 +206,7 @@ func (queryRunner *PgQueryRunner) getSystemIdentifier() (err error) {
 		return nil
 	}
 	conn := queryRunner.Connection
-	err = conn.QueryRow(queryRunner.buildGetSystemIdentifier()).Scan(&queryRunner.SystemIdentifier)
+	err = conn.QueryRow(context.Background(), queryRunner.buildGetSystemIdentifier()).Scan(&queryRunner.SystemIdentifier)
 	return errors.Wrap(err, "System Identifier: getting identifier of DB failed")
 }
 
@@ -223,7 +223,7 @@ func (queryRunner *PgQueryRunner) startBackup(backup string) (backupName string,
 		return "", "", false, errors.Wrap(err, "QueryRunner StartBackup: Building start backup query failed")
 	}
 
-	if err = conn.QueryRow(startBackupQuery, backup).Scan(&backupName, &lsnString, &inRecovery); err != nil {
+	if err = conn.QueryRow(context.Background(), startBackupQuery, backup).Scan(&backupName, &lsnString, &inRecovery); err != nil {
 		return "", "", false, errors.Wrap(err, "QueryRunner StartBackup: pg_start_backup() failed")
 	}
 
@@ -238,7 +238,7 @@ func (queryRunner *PgQueryRunner) stopBackup() (label string, offsetMap string, 
 	tracelog.InfoLogger.Println("Calling pg_stop_backup()")
 	conn := queryRunner.Connection
 
-	tx, err := conn.Begin()
+	tx, err := conn.Begin(context.Background())
 	if err != nil {
 		return "", "", "", errors.Wrap(err, "QueryRunner StopBackup: transaction begin failed")
 	}
